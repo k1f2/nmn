@@ -1,46 +1,258 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Favicon -->
-  <link rel="icon" href="favicon.png" type="image/x-icon">
-  
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Crafted by NMN</title>
-  <meta name="description" content="Coming soon" />
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; background:#000; color:#fff; font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, "Noto Sans", sans-serif; }
-    .wrap { position: fixed; inset: 0; overflow: hidden; background:#000; }
-    video {
-      position: absolute; top: 50%; left: 50%;
-      min-width: 100%; min-height: 100%;
-      width: auto; height: auto;
-      transform: translate(-50%, -50%);
-      object-fit: cover;
-      filter: brightness(0.6); /* keep text readable */
-    }
-    .overlay {
-      position: absolute; inset: 0;
-      display: grid; place-items: center;
-      text-align: center; padding: 2rem;
-    }
-    h1 { font-size: clamp(2rem, 6vw, 6rem); letter-spacing: .06em; text-transform: lowercase; font-weight: 800; }
-    @media (prefers-reduced-motion: reduce) {
-      video { display: none; }
-      .wrap { background: #000 url('poster.jpg') center/cover no-repeat; }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brand Launch</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #000;
+            overflow: hidden;
+        }
+
+        .launch-container {
+            position: relative;
+            width: 90vw;
+            max-width: 600px;
+            height: 70vh;
+            max-height: 400px;
+            background-color: #fff;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .ribbon-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #8B0000;
+            z-index: 3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 1s ease-in-out;
+            cursor: pointer;
+        }
+
+        .ribbon-text {
+            color: white;
+            font-size: 2em;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .ribbon-layer.open {
+            transform: translateY(-100%);
+        }
+
+        #scratch-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            cursor: grab;
+            display: none; /* Initially hidden */
+        }
+
+        .reveal-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            text-align: center;
+        }
+
+        .reveal-content.visible {
+            opacity: 1;
+        }
+
+        #logo-video {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+        }
+
+        #products-button {
+            margin-top: 20px;
+            padding: 12px 30px;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: white;
+            background-color: #000;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: background-color 0.3s;
+        }
+
+        #products-button:hover {
+            background-color: #333;
+        }
+    </style>
 </head>
 <body>
-  <div class="wrap">
-    <!-- Replace the src filenames with your video(s). Keep muted+playsinline so autoplay works on mobile. -->
-    <video autoplay muted loop playsinline preload="metadata" poster="poster.jpg" aria-label="Background video">
-      <source src="coming-soon.mp4" type="video/mp4" />
-      Your browser does not support the video tag.
-    </video>
-    <div class="overlay">
+
+    <div class="launch-container">
+        <div class="ribbon-layer">
+            <div class="ribbon-text">Click to Reveal</div>
+        </div>
+
+        <canvas id="scratch-canvas"></canvas>
+
+        <div class="reveal-content">
+            <video src="your-logo-video.mp4" id="logo-video" muted playsinline></video>
+            <button id="products-button">View Products</button>
+        </div>
     </div>
-  </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const ribbon = document.querySelector('.ribbon-layer');
+            const canvas = document.getElementById('scratch-canvas');
+            const ctx = canvas.getContext('2d');
+            const revealContent = document.querySelector('.reveal-content');
+            const logoVideo = document.getElementById('logo-video');
+            const productsButton = document.getElementById('products-button');
+
+            let scratching = false;
+            let scratchPercentage = 0;
+            const revealThreshold = 70; // Percentage of the card to scratch before revealing
+
+            // Set canvas dimensions to match container
+            const setCanvasDimensions = () => {
+                canvas.width = canvas.offsetWidth;
+                canvas.height = canvas.offsetHeight;
+                drawScratchLayer();
+            };
+
+            // Draw the initial scratch layer
+            const drawScratchLayer = () => {
+                ctx.fillStyle = '#926B33';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.globalCompositeOperation = 'destination-out';
+            };
+
+            // Draw the scratch path
+            const scratch = (x, y) => {
+                ctx.beginPath();
+                ctx.arc(x, y, 100, 0, 2 * Math.PI);
+                ctx.fill();
+            };
+
+            // Calculate how much has been scratched off
+            const calculateScratchPercentage = () => {
+                const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const totalPixels = pixels.data.length / 4;
+                let transparentPixels = 0;
+
+                for (let i = 0; i < pixels.data.length; i += 4) {
+                    if (pixels.data[i + 3] === 0) {
+                        transparentPixels++;
+                    }
+                }
+                return (transparentPixels / totalPixels) * 100;
+            };
+
+            // Handle the ribbon click to "open" it
+            ribbon.addEventListener('click', () => {
+                ribbon.classList.add('open');
+                setTimeout(() => {
+                    canvas.style.display = 'block';
+                }, 1000);
+            });
+
+            // Start scratching
+            canvas.addEventListener('mousedown', (e) => {
+                scratching = true;
+                const x = e.offsetX;
+                const y = e.offsetY;
+                scratch(x, y);
+            });
+
+            // Continue scratching while moving
+            canvas.addEventListener('mousemove', (e) => {
+                if (!scratching) return;
+                const x = e.offsetX;
+                const y = e.offsetY;
+                scratch(x, y);
+
+                scratchPercentage = calculateScratchPercentage();
+                if (scratchPercentage >= revealThreshold) {
+                    revealPageContent();
+                }
+            });
+
+            // Stop scratching
+            canvas.addEventListener('mouseup', () => {
+                scratching = false;
+            });
+
+            // Handle touch events for mobile
+            canvas.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                scratching = true;
+                const touch = e.touches[0];
+                const x = touch.clientX - canvas.getBoundingClientRect().left;
+                const y = touch.clientY - canvas.getBoundingClientRect().top;
+                scratch(x, y);
+            }, { passive: false });
+
+            canvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                if (!scratching) return;
+                const touch = e.touches[0];
+                const x = touch.clientX - canvas.getBoundingClientRect().left;
+                const y = touch.clientY - canvas.getBoundingClientRect().top;
+                scratch(x, y);
+
+                scratchPercentage = calculateScratchPercentage();
+                if (scratchPercentage >= revealThreshold) {
+                    revealPageContent();
+                }
+            }, { passive: false });
+
+            canvas.addEventListener('touchend', () => {
+                scratching = false;
+            });
+
+            // Final reveal function
+            const revealPageContent = () => {
+                canvas.style.pointerEvents = 'none';
+                canvas.classList.add('fade-out');
+                revealContent.classList.add('visible');
+                logoVideo.play();
+            };
+
+            // Event listener for the "View Products" button
+            productsButton.addEventListener('click', () => {
+                window.location.href = 'your-products-page.html';
+            });
+
+            // Initialize the canvas and scratch layer
+            setCanvasDimensions();
+            window.addEventListener('resize', setCanvasDimensions);
+        });
+    </script>
 </body>
 </html>
