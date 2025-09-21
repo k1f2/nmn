@@ -1,0 +1,109 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #000;
+    overflow: hidden;
+}
+
+.launch-container {
+    position: relative;
+    width: 90vw;
+    max-width: 600px;
+    height: 70vh;
+    max-height: 400px;
+    background-color: #fff;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+#scratch-canvas.fade-out {
+    opacity: 0;
+    transition: opacity 1s ease-out; /* Match this with your ribbon transition for consistency */
+}
+
+.ribbon-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000; /* Dark red ribbon color */
+    z-index: 3;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 1s ease-in-out;
+    cursor: pointer;
+}
+
+.ribbon-text {
+    color: white;
+    font-size: 2em;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* Class to "open" the ribbon */
+.ribbon-layer.open {
+    transform: translateY(-100%);
+}
+
+#scratch-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    cursor: url('https://example.com/cursor.png'), grab; /* Optional: Custom cursor */
+}
+
+.reveal-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+    text-align: center;
+}
+
+.reveal-content.visible {
+    opacity: 1;
+}
+
+#logo-video {
+    width: 100%;
+    max-width: 400px; /* Adjust as needed */
+    height: auto;
+}
+
+#products-button {
+    margin-top: 20px;
+    padding: 12px 30px;
+    font-size: 1.1em;
+    font-weight: bold;
+    color: white;
+    background-color: #000;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: background-color 0.3s;
+}
+
+#products-button:hover {
+    background-color: #333;
+}
